@@ -1,8 +1,7 @@
 DROP TABLE IF EXISTS skills_job_dim;
 DROP TABLE IF EXISTS job_postings_fact;
-DROP TABLE IF EXISTS skill_dim;
+DROP TABLE IF EXISTS skills_dim;
 DROP TABLE IF EXISTS company_dim;
-
 
 
 
@@ -11,9 +10,9 @@ CREATE TABLE company_dim(
     name        VARCHAR
 );
 
-CREATE TABLE skill_dim(
+CREATE TABLE skills_dim(
     skill_id    INTEGER     PRIMARY KEY,    
-    skill       VARCHAR,
+    skills       VARCHAR,
     type        VARCHAR
 );
 
@@ -40,7 +39,7 @@ CREATE TABLE skills_job_dim(
     skill_id    INTEGER,
     job_id      INTEGER,
     PRIMARY KEY(skill_id,job_id),
-    FOREIGN KEY(skill_id) REFERENCES skill_dim(skill_id),
+    FOREIGN KEY(skill_id) REFERENCES skills_dim(skill_id),
     FOREIGN KEY(job_id) REFERENCES job_postings_fact(job_id)
     
 );
