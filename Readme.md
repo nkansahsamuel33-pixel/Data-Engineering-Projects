@@ -51,7 +51,6 @@ Raw job posting data arrives as flat CSV files in Google Cloud Storage—not str
 ├── 04_create_skills_mart.sql      # Skills demand mart
 ├── 05_create_priority_mart.sql    # Priority roles mart
 ├── 06_update_priority_mart.sql    # Priority mart incremental update (MERGE)
-├── 07_create_company_mart.sql     # Company hiring mart (optional)
 ├── build_dw_marts.sql             # Master SQL build script
 └── README.md                       # You are here
 ```
