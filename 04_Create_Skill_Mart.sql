@@ -47,7 +47,7 @@ SELECT DISTINCT
     EXTRACT(YEAR FROM job_posted_date) :: VARCHAR || '-Q' ||  
     EXTRACT(QUARTER FROM job_posted_date) :: VARCHAR AS year_quarter
 
-FROM jobs_postings_fact
+FROM job_postings_fact
 ORDER BY month_start_date;
 
 CREATE TABLE skills_mart.fact_skill_demand_monthly (
@@ -59,8 +59,8 @@ CREATE TABLE skills_mart.fact_skill_demand_monthly (
     health_insurance_postings_count INTEGER,
     no_degree_mention_count INTEGER,
     PRIMARY KEY (skill_id, month_start_date, job_title_short),
-    FOREIGN KEY (skill_id) REFERENCES skills_mart.dim_skill(skill_id),
-    FOREIGN KEY (month_start_date) REFERENCES skills_mart.dim_date_month(month_start_date)
+    FOREIGN KEY (skill_id) REFERENCES skills_mart.dim_skills(skill_id),
+    FOREIGN KEY (month_start_date) REFERENCES skills_mart.date_month(month_start_date)
 );
 
 INSERT INTO skills_mart.fact_skill_demand_monthly (
@@ -109,15 +109,15 @@ GROUP BY
     job_title_short;
 
 -- Data Validation
-SELECT 'Skill Dimension' AS table_name, COUNT(*) as record_count FROM skills_mart.dim_skill
+SELECT 'Skill Dimension' AS table_name, COUNT(*) as record_count FROM skills_mart.dim_skills
 UNION ALL
-SELECT 'Date Month Dimension', COUNT(*) FROM skills_mart.dim_date_month
+SELECT 'Date Month Dimension', COUNT(*) FROM skills_mart.date_month
 UNION ALL
 SELECT 'Skill Demand Fact', COUNT(*) FROM skills_mart.fact_skill_demand_monthly;
 
 -- Show sample data from each table
 SELECT '=== Skill Dimension Sample ===' AS info;
-SELECT * FROM skills_mart.dim_skill LIMIT 10;
+SELECT * FROM skills_mart.dim_skills LIMIT 10;
 
 SELECT '=== Date Month Dimension Sample ===' AS info;
-SELECT * FROM skills_mart.dim_date_month ORDER BY month_start_date DESC LIMIT 10;
+SELECT * FROM skills_mart.date_month ORDER BY month_start_date DESC LIMIT 10;

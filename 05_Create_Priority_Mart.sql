@@ -5,12 +5,13 @@ CREATE SCHEMA priority_mart;
 
 -- Step 2: Create priority roles dimension table
 -- This table defines priority levels for different job roles
-CREATE TABLE priority_mart.priority_roles (                         
+CREATE TABLE priority_mart.priority_roles (
+  role_id      INTEGER PRIMARY KEY,
   role_name    VARCHAR,
   priority_lvl INTEGER
 );
 
-INSERT INTO priority_mart.priority_roles (role_id, role_name, priority_lvl)       
+INSERT INTO priority_mart.priority_roles (role_id, role_name, priority_lvl)
 VALUES
   (1, 'Data Engineer',       2),
   (2, 'Senior Data Engineer', 1),

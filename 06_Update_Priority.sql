@@ -4,9 +4,9 @@ SET priority_lvl = 1
 WHERE role_name = 'Data Engineer';
 
 -- Add Data Scientist as Level 3
-INSERT INTO priority_mart.priority_roles (role_id, role_name, priority_lvl) 
+INSERT INTO priority_mart.priority_roles (role_id, role_name, priority_lvl)
 VALUES
-(4,'Data Scientist', 3);
+(4, 'Data Scientist', 3);
 
 --  Create temporary source table
 -- This table contains the current state of priority jobs from the data warehouse

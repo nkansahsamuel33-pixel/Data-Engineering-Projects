@@ -1,12 +1,60 @@
+-- Drop existing flat mart schema if it exists (for idempotency)
 DROP SCHEMA IF EXISTS flat_mart CASCADE;
+
+-- Create the flat mart schema
 CREATE SCHEMA flat_mart;
 
-SELECT '== Loading flat mart job postings ==' AS info;
+-- Create flat mart table
+-- This flattens the star schema into a single denormalized table
+-- Each row represents one job posting with all dimensions included
+CREATE TABLE flat_mart.job_postings (
+    -- Fact table fields
+    job_id INTEGER PRIMARY KEY,
+    job_title_short VARCHAR,
+    job_location VARCHAR,
+    job_via VARCHAR,
+    job_schedule_type VARCHAR,
+    job_work_from_home BOOLEAN,
+    search_location VARCHAR,
+    job_posted_date TIMESTAMP,
+    job_no_degree_mention BOOLEAN,
+    job_health_insurance BOOLEAN,
+    job_country VARCHAR,
+    salary_rate VARCHAR,
+    salary_year_avg DOUBLE,
+    salary_hour_avg DOUBLE,
+    -- Company dimension fields
+    company_id INTEGER,
+    company_name VARCHAR,
+    -- Aggregate skills into a array of structs with type and name
+    skills_and_types STRUCT(
+        type VARCHAR,
+        name VARCHAR
+    )[]
+);
 
-CREATE OR REPLACE flat_mart.job_postings AS
+INSERT INTO flat_mart.job_postings (
+    job_id,
+    job_title_short,
+    job_location,
+    job_via,
+    job_schedule_type,
+    job_work_from_home,
+    search_location,
+    job_posted_date,
+    job_no_degree_mention,
+    job_health_insurance,
+    job_country,
+    salary_rate,
+    salary_year_avg,
+    salary_hour_avg,
+    company_id,
+    company_name,
+    skills_and_types
+)
 SELECT
+    -- Fact table fields
     jpf.job_id,
-    jpf.company_id,
     jpf.job_title_short,
     jpf.job_location,
     jpf.job_via,
@@ -20,30 +68,36 @@ SELECT
     jpf.salary_rate,
     jpf.salary_year_avg,
     jpf.salary_hour_avg,
+    -- Company dimension fields
     cd.company_id,
     cd.name AS company_name,
+    -- Aggregate skills into an array of structs
     ARRAY_AGG(
-        STRUCT_PACK (
-            type := sd.type,
-            name := sd.skills
-        )
+      STRUCT_PACK(
+        type := sd.type,
+        name := sd.skills
+      )
     ) AS skills_and_types
-
-FROM job_postings_fact AS jpf 
-LEFT JOIN  company_dim AS cd
-ON jpf.company_id = cd.company_id
-
-LEFT JOIN  skills_job_dim_dim AS skd
-ON jpf.job_id = sjd.job_id
-
-LEFT JOIN skills_dim AS sd 
-ON sjd.skill_id = sd.skill_id
-
+FROM
+    job_postings_fact AS jpf
+    LEFT JOIN company_dim AS cd ON jpf.company_id = cd.company_id
+    LEFT JOIN skills_job_dim AS sjd ON jpf.job_id = sjd.job_id
+    LEFT JOIN skills_dim AS sd ON sjd.skill_id = sd.skill_id
 GROUP BY ALL;
 
--- Data Validation Check
+-- Verify flat mart was created
+SELECT 'Flat Mart Job Postings' AS table_name, COUNT(*) as record_count FROM flat_mart.job_postings;
 
-SELECT 'flat mart job postings' AS table_name COUNT(*) AS record_count FROM flat_mart.job_postings
-
-SELECT '== flat mart job postings sample ==' AS info;
-SELECT * FROM flat_mart.job_postings LIMIT 10;
+-- Show sample data
+SELECT '=== Flat Mart Sample ===' AS info;
+SELECT 
+    job_id,
+    company_name,
+    job_title_short,
+    job_location,
+    job_country,
+    salary_year_avg,
+    job_work_from_home,
+    skills_and_types
+FROM flat_mart.job_postings 
+LIMIT 10;
